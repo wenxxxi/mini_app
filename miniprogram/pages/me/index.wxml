@@ -1,0 +1,46 @@
+<view class="container">
+  <view class="card">
+    <view class="row">
+      <view class="avatar">{{user && user.nickname ? user.nickname[0] : '我'}}</view>
+      <view class="user-info">
+        <view class="user-name">{{user && user.nickname ? user.nickname : '微信用户'}}</view>
+        <view class="muted">ID {{user ? user.id : '-'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="row">
+      <view>
+        <view>日界时间</view>
+        <view class="muted">早于该时刻的记录归到前一天</view>
+      </view>
+      <picker mode="selector" range="{{[0,1,2,3,4,5,6,7,8,9,10,11,12]}}" value="{{dayStartHour}}" bindchange="onDayStartChange">
+        <view class="pill pill-brand mono">{{dayStartHour}}:00</view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="row">
+      <view>
+        <view>待同步写入</view>
+        <view class="muted">网络恢复后可手动重试</view>
+      </view>
+      <view class="pill mono">{{pending}} 条</view>
+    </view>
+    <view class="btn-row">
+      <button class="btn" bindtap="syncPending">立即同步</button>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">数据</view>
+    <view class="btn-row">
+      <button class="btn" bindtap="exportData" loading="{{exporting}}">导出近 90 天</button>
+      <button class="btn" bindtap="relogin">重新登录</button>
+    </view>
+  </view>
+
+  <view class="muted footer">复盘小程序 · 体验版 · 数据仅存于自己的树莓派</view>
+</view>

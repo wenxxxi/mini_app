@@ -1,0 +1,16 @@
+{
+  "appid": "wx74943a61c2a9963d",
+  "projectname": "review-miniapp",
+  "compileType": "miniprogram",
+  "libVersion": "3.5.5",
+  "miniprogramRoot": "./",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": false,
+    "urlCheck": false,
+    "packNpmManually": false
+  },
+  "condition": {}
+}

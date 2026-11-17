@@ -1,0 +1,29 @@
+<view class="container">
+  <view class="card">
+    <view class="field">
+      <view class="field-label">标题</view>
+      <input class="input" value="{{title}}" placeholder="例如：项目上线" bindinput="onTitle" />
+    </view>
+    <view class="field">
+      <view class="field-label">目标日期</view>
+      <picker mode="date" value="{{date}}" bindchange="onDate">
+        <view class="input mono">{{date}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <view class="field-label">目标时间</view>
+      <picker mode="time" value="{{time}}" bindchange="onTime">
+        <view class="input mono">{{time}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <view class="field-label">备注</view>
+      <input class="input" value="{{note}}" placeholder="选填" bindinput="onNote" />
+    </view>
+  </view>
+
+  <view class="btn-row">
+    <button class="btn btn-danger" bindtap="remove">删除</button>
+    <button class="btn btn-primary" bindtap="save">保存</button>
+  </view>
+</view>

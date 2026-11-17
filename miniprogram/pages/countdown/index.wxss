@@ -1,0 +1,65 @@
+.hero {
+  padding: 36rpx 28rpx 28rpx;
+}
+
+.hero-title {
+  font-size: 30rpx;
+  color: var(--text-muted);
+}
+
+.hero-num {
+  margin-top: 16rpx;
+}
+
+.big {
+  font-size: 104rpx;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.unit {
+  font-size: 28rpx;
+  color: var(--text-muted);
+  margin-left: 8rpx;
+}
+
+.hero-sub {
+  margin-top: 12rpx;
+  font-size: 30rpx;
+  color: var(--text);
+}
+
+.hero-note {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  color: var(--text-muted);
+}
+
+.hero-tip {
+  margin-top: 24rpx;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.item {
+  padding: 24rpx 28rpx;
+}
+
+.item.active {
+  border-color: var(--brand);
+}
+
+.item-title {
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.full {
+  width: 100%;
+  margin-top: 8rpx;
+}

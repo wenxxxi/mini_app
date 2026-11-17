@@ -1,0 +1,26 @@
+.avatar {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  text-align: center;
+  line-height: 88rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  margin-right: 20rpx;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 30rpx;
+  font-weight: 500;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 40rpx;
+}

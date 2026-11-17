@@ -1,0 +1,43 @@
+<view class="container">
+  <view wx:if="{{current}}" class="card hero" bindlongpress="edit">
+    <view class="hero-title">{{current.title}}</view>
+    <view wx:if="{{!parts.past}}" class="hero-num mono">
+      <text class="big">{{parts.days}}</text><text class="unit">天</text>
+    </view>
+    <view wx:if="{{!parts.past}}" class="hero-sub mono">
+      {{parts.hours}} 时 {{parts.minutes}} 分 {{parts.seconds}} 秒
+    </view>
+    <view wx:else class="hero-sub mono">已过去 {{parts.days}} 天</view>
+    <view wx:if="{{current.note}}" class="hero-note">{{current.note}}</view>
+    <view class="muted hero-tip">长按卡片编辑</view>
+  </view>
+
+  <view wx:if="{{!current && !loading}}" class="card">
+    <view class="empty">还没有倒计时</view>
+  </view>
+
+  <view class="section-head">
+    <text class="card-title" style="margin-bottom:0">全部倒计时</text>
+    <view class="btn" bindtap="add">+ 新建</view>
+  </view>
+
+  <view
+    wx:for="{{items}}"
+    wx:key="id"
+    class="card item {{current && current.id === item.id ? 'active' : ''}}"
+    data-id="{{item.id}}"
+    bindtap="select"
+  >
+    <view class="row">
+      <view>
+        <view class="item-title">{{item.title}}</view>
+        <view class="muted mono">{{item.target_at}}</view>
+      </view>
+      <view class="pill {{current && current.id === item.id ? 'pill-brand' : ''}}">
+        {{current && current.id === item.id ? '当前' : '切换'}}
+      </view>
+    </view>
+  </view>
+
+  <button class="btn btn-primary full" bindtap="add">新建倒计时</button>
+</view>

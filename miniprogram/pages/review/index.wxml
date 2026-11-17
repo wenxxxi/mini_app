@@ -1,0 +1,183 @@
+<view class="container">
+  <view class="date-nav">
+    <view class="nav-btn" data-delta="-1" bindtap="changeDate">‹</view>
+    <view class="date-center">
+      <view class="mono date-text">{{date}}</view>
+      <view class="muted">{{weekdayText}}</view>
+    </view>
+    <view class="nav-btn" data-delta="1" bindtap="changeDate">›</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">时间与时长</view>
+    <view class="row">
+      <text class="muted">起床时间</text>
+      <picker mode="time" value="{{wakeTime}}" bindchange="onWakeChange">
+        <view class="picker-value mono">{{wakeTime || '选择时间'}}</view>
+      </picker>
+    </view>
+    <view class="row">
+      <text class="muted">工作时长</text>
+      <view class="stepper">
+        <view class="stepper-btn" data-delta="-15" bindtap="adjustWork">-</view>
+        <text class="mono value">{{workText}}</text>
+        <view class="stepper-btn" data-delta="15" bindtap="adjustWork">+</view>
+      </view>
+    </view>
+    <view class="row">
+      <text class="muted">娱乐时长</text>
+      <view class="stepper">
+        <view class="stepper-btn" data-delta="-15" bindtap="adjustFun">-</view>
+        <text class="mono value">{{funText}}</text>
+        <view class="stepper-btn" data-delta="15" bindtap="adjustFun">+</view>
+      </view>
+    </view>
+    <view class="row">
+      <text class="muted">心情</text>
+      <view class="mood-row">
+        <view
+          wx:for="{{[1,2,3,4,5]}}"
+          wx:key="*this"
+          class="mood {{mood >= item ? 'on' : ''}}"
+          data-mood="{{item}}"
+          bindtap="setMood"
+        ></view>
+      </view>
+    </view>
+    <view class="row">
+      <text class="muted">工作记录合计 {{starMinutesText}}</text>
+      <view class="btn" bindtap="sumStarMinutes">同步为工时</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">三餐与营养</view>
+    <view
+      wx:for="{{mealRows}}"
+      wx:key="type"
+      class="meal-row"
+      data-type="{{item.type}}"
+      bindtap="openMeal"
+    >
+      <view class="row" style="flex:1">
+        <text>{{item.label}}</text>
+        <text class="muted mono">{{item.time || '未填写'}}</text>
+      </view>
+      <view class="pill {{item.filled ? 'pill-brand' : ''}}">
+        {{item.filled ? item.kcal + ' kcal' : '去填写'}}
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="row">
+      <view class="card-title" style="margin-bottom:0">工作进度 · STAR</view>
+      <view class="btn" data-id="" bindtap="openStar">添加</view>
+    </view>
+    <view class="divider"></view>
+    <view wx:if="{{starItems.length === 0}}" class="empty">用情境、任务、行动、结果四段记录今天的工作</view>
+    <view wx:for="{{starItems}}" wx:key="id" class="star-block" data-id="{{item.id}}" bindtap="openStar">
+      <view class="row">
+        <text class="star-title">{{item.title}}</text>
+        <text class="muted mono">{{item.progress}}%</text>
+      </view>
+      <view class="bar"><view class="bar-inner" style="width: {{item.progress}}%"></view></view>
+      <view class="muted star-meta" wx:if="{{item.result}}">{{item.result}}</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">今日总结</view>
+    <textarea
+      class="input textarea"
+      value="{{summary}}"
+      placeholder="写点今天的感受"
+      bindinput="onSummaryInput"
+      bindblur="onSummaryBlur"
+    ></textarea>
+  </view>
+</view>
+
+<!-- 餐食弹层 -->
+<view wx:if="{{mealSheet.visible}}" class="mask" bindtap="closeMeal"></view>
+<view wx:if="{{mealSheet.visible}}" class="sheet" catchtap="noop">
+  <view class="sheet-title">填写{{mealSheet.meal_type === 'breakfast' ? '早餐' : mealSheet.meal_type === 'lunch' ? '午餐' : mealSheet.meal_type === 'dinner' ? '晚餐' : '加餐'}}</view>
+
+  <view class="field">
+    <view class="field-label">就餐时间</view>
+    <picker mode="time" value="{{mealSheet.time}}" bindchange="onMealTime">
+      <view class="input mono">{{mealSheet.time || '选择时间'}}</view>
+    </picker>
+  </view>
+
+  <view class="field-label">食物与营养</view>
+  <view wx:for="{{mealSheet.foods}}" wx:key="index" class="food-block">
+    <view class="row">
+      <input class="input food-name" value="{{item.name}}" placeholder="食物名称" data-index="{{index}}" data-field="name" bindinput="onFoodField" />
+      <view class="remove" data-index="{{index}}" bindtap="removeFood">删除</view>
+    </view>
+    <view class="food-grid">
+      <input class="input" type="digit" value="{{item.amount}}" placeholder="数量" data-index="{{index}}" data-field="amount" bindinput="onFoodField" />
+      <input class="input" value="{{item.unit}}" placeholder="单位" data-index="{{index}}" data-field="unit" bindinput="onFoodField" />
+      <input class="input" type="digit" value="{{item.kcal}}" placeholder="千卡" data-index="{{index}}" data-field="kcal" bindinput="onFoodField" />
+    </view>
+    <view class="food-grid">
+      <input class="input" type="digit" value="{{item.protein}}" placeholder="蛋白(g)" data-index="{{index}}" data-field="protein" bindinput="onFoodField" />
+      <input class="input" type="digit" value="{{item.fat}}" placeholder="脂肪(g)" data-index="{{index}}" data-field="fat" bindinput="onFoodField" />
+      <input class="input" type="digit" value="{{item.carb}}" placeholder="碳水(g)" data-index="{{index}}" data-field="carb" bindinput="onFoodField" />
+    </view>
+  </view>
+
+  <view class="btn add-food" bindtap="addFood">+ 添加食物</view>
+
+  <view class="field">
+    <view class="field-label">备注</view>
+    <input class="input" value="{{mealSheet.note}}" placeholder="选填" bindinput="onMealNote" />
+  </view>
+
+  <view class="btn-row">
+    <button class="btn btn-danger" bindtap="deleteMeal">删除</button>
+    <button class="btn btn-primary" bindtap="saveMeal">保存</button>
+  </view>
+</view>
+
+<!-- STAR 弹层 -->
+<view wx:if="{{starSheet.visible}}" class="mask" bindtap="closeStar"></view>
+<view wx:if="{{starSheet.visible}}" class="sheet" catchtap="noop">
+  <view class="sheet-title">{{starSheet.id ? '编辑工作记录' : '新增工作记录'}}</view>
+
+  <view class="field">
+    <view class="field-label">标题</view>
+    <input class="input" value="{{starSheet.title}}" placeholder="例如：完成接口重构" data-field="title" bindinput="onStarField" />
+  </view>
+  <view class="field">
+    <view class="field-label">S · 情境</view>
+    <textarea class="input textarea" value="{{starSheet.situation}}" data-field="situation" bindinput="onStarField" placeholder="当时是什么背景"></textarea>
+  </view>
+  <view class="field">
+    <view class="field-label">T · 任务</view>
+    <textarea class="input textarea" value="{{starSheet.task}}" data-field="task" bindinput="onStarField" placeholder="你的目标是什么"></textarea>
+  </view>
+  <view class="field">
+    <view class="field-label">A · 行动</view>
+    <textarea class="input textarea" value="{{starSheet.action}}" data-field="action" bindinput="onStarField" placeholder="你做了什么"></textarea>
+  </view>
+  <view class="field">
+    <view class="field-label">R · 结果</view>
+    <textarea class="input textarea" value="{{starSheet.result}}" data-field="result" bindinput="onStarField" placeholder="带来了什么结果"></textarea>
+  </view>
+
+  <view class="field">
+    <view class="field-label">进度 {{starSheet.progress}}%</view>
+    <slider value="{{starSheet.progress}}" min="0" max="100" step="5" activeColor="#0f9d58" bindchange="onStarProgress" />
+  </view>
+  <view class="field">
+    <view class="field-label">耗时（分钟）</view>
+    <input class="input" type="number" value="{{starSheet.minutes}}" data-field="minutes" bindinput="onStarMinutes" />
+  </view>
+
+  <view class="btn-row">
+    <button class="btn btn-danger" bindtap="deleteStar">删除</button>
+    <button class="btn btn-primary" bindtap="saveStar">保存</button>
+  </view>
+</view>

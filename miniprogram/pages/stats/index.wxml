@@ -1,0 +1,49 @@
+<view class="container">
+  <view class="seg">
+    <view class="seg-item {{range === 7 ? 'on' : ''}}" data-range="7" bindtap="switchRange">近 7 天</view>
+    <view class="seg-item {{range === 30 ? 'on' : ''}}" data-range="30" bindtap="switchRange">近 30 天</view>
+  </view>
+
+  <view class="card">
+    <view class="metric-grid">
+      <view class="metric">
+        <view class="muted">记录天数</view>
+        <view class="metric-value mono">{{days}}</view>
+      </view>
+      <view class="metric">
+        <view class="muted">平均起床</view>
+        <view class="metric-value mono">{{avgWake}}</view>
+      </view>
+      <view class="metric">
+        <view class="muted">总工时</view>
+        <view class="metric-value mono">{{workText}}</view>
+      </view>
+      <view class="metric">
+        <view class="muted">总娱乐</view>
+        <view class="metric-value mono">{{funText}}</view>
+      </view>
+    </view>
+    <view class="divider"></view>
+    <view class="row">
+      <text class="muted">日均热量</text>
+      <text class="mono value">{{avgKcal}} kcal</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">每日时长</view>
+    <view wx:if="{{rows.length === 0}}" class="empty">这个区间还没有记录</view>
+    <view wx:for="{{rows}}" wx:key="date" class="bar-row">
+      <view class="bar-label mono">{{item.label}}</view>
+      <view class="bar-track">
+        <view class="bar-work" style="width: {{item.workPct}}%"></view>
+        <view class="bar-fun" style="width: {{item.funPct}}%"></view>
+      </view>
+      <view class="bar-value mono">{{item.workText}}</view>
+    </view>
+    <view class="legend">
+      <view class="legend-item"><view class="dot work"></view><text class="muted">工作</text></view>
+      <view class="legend-item"><view class="dot fun"></view><text class="muted">娱乐</text></view>
+    </view>
+  </view>
+</view>

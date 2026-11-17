@@ -1,0 +1,31 @@
+{
+  "pages": [
+    "pages/today/index",
+    "pages/countdown/index",
+    "pages/stats/index",
+    "pages/me/index",
+    "pages/review/index",
+    "pages/countdown-edit/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "每日复盘",
+    "backgroundColor": "#f7f7f8",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#8a8a8f",
+    "selectedColor": "#0f9d58",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/today/index", "text": "今日" },
+      { "pagePath": "pages/countdown/index", "text": "倒计时" },
+      { "pagePath": "pages/stats/index", "text": "统计" },
+      { "pagePath": "pages/me/index", "text": "我的" }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2"
+}

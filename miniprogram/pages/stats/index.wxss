@@ -1,0 +1,102 @@
+.seg {
+  display: flex;
+  background: var(--surface-muted);
+  border-radius: var(--radius);
+  padding: 6rpx;
+  margin-bottom: 24rpx;
+}
+
+.seg-item {
+  flex: 1;
+  text-align: center;
+  padding: 14rpx 0;
+  font-size: 26rpx;
+  color: var(--text-muted);
+  border-radius: 12rpx;
+}
+
+.seg-item.on {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.metric-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.metric {
+  width: 50%;
+  margin-bottom: 20rpx;
+}
+
+.metric-value {
+  font-size: 30rpx;
+  font-weight: 500;
+  margin-top: 6rpx;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.bar-label {
+  width: 88rpx;
+  font-size: 22rpx;
+  color: var(--text-muted);
+}
+
+.bar-track {
+  flex: 1;
+  margin: 0 16rpx;
+}
+
+.bar-work {
+  height: 10rpx;
+  background: var(--brand);
+  border-radius: 999rpx;
+}
+
+.bar-fun {
+  height: 10rpx;
+  background: var(--surface-muted);
+  border-radius: 999rpx;
+  margin-top: 6rpx;
+}
+
+.bar-value {
+  width: 120rpx;
+  text-align: right;
+  font-size: 22rpx;
+  color: var(--text-muted);
+}
+
+.legend {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 20rpx;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+}
+
+.dot.work {
+  background: var(--brand);
+}
+
+.dot.fun {
+  background: var(--surface-muted);
+  border: 1rpx solid var(--border);
+}

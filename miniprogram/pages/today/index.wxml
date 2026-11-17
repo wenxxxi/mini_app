@@ -1,0 +1,83 @@
+<view class="container">
+  <view class="card hero" bindtap="goReview">
+    <view class="row">
+      <view>
+        <view class="hero-date mono">{{date}}</view>
+        <view class="muted">{{weekdayText}}</view>
+      </view>
+      <view class="pill {{doneCount >= 3 ? 'pill-brand' : ''}}">完成 {{doneCount}}/4</view>
+    </view>
+
+    <view class="hero-grid">
+      <view class="hero-item">
+        <view class="muted">起床</view>
+        <view class="hero-value mono">{{wakeTime || '--:--'}}</view>
+      </view>
+      <view class="hero-item">
+        <view class="muted">工作</view>
+        <view class="hero-value mono">{{workText}}</view>
+      </view>
+      <view class="hero-item">
+        <view class="muted">娱乐</view>
+        <view class="hero-value mono">{{funText}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="row">
+      <view class="card-title" style="margin-bottom:0">三餐</view>
+      <view class="muted">{{doneMeals}}/3 已记录</view>
+    </view>
+    <view class="divider"></view>
+    <view class="meal-row" wx:for="{{meals}}" wx:key="type">
+      <view class="row" style="flex:1">
+        <text>{{item.label}}</text>
+        <text class="muted mono">{{item.time || '未填写'}}</text>
+      </view>
+      <view class="pill {{item.filled ? 'pill-brand' : ''}}" style="margin-left:16rpx">
+        {{item.filled ? item.kcal + ' kcal' : '去填写'}}
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="row">
+      <view class="card-title" style="margin-bottom:0">工作记录</view>
+      <view class="muted">{{starItems.length}} 条</view>
+    </view>
+    <view class="divider"></view>
+    <view wx:if="{{starItems.length === 0}}" class="empty">今天还没有记录，点击上方卡片添加</view>
+    <view wx:for="{{starItems}}" wx:key="id" class="star-line">
+      <view class="row">
+        <text class="star-title">{{item.title}}</text>
+        <text class="muted mono">{{item.progress}}%</text>
+      </view>
+      <view class="bar"><view class="bar-inner" style="width: {{item.progress}}%"></view></view>
+    </view>
+  </view>
+
+  <view class="card" bindtap="goCountdown">
+    <view class="row">
+      <view class="card-title" style="margin-bottom:0">最近倒计时</view>
+      <text class="muted">查看全部 ›</text>
+    </view>
+    <block wx:if="{{nearest}}">
+      <view class="count-title">{{nearest.title}}</view>
+      <view class="count-value mono" wx:if="{{!nearestParts.past}}">
+        {{nearestParts.days}}<text class="unit">天</text>{{nearestParts.hours}}<text class="unit">时</text>{{nearestParts.minutes}}<text class="unit">分</text>
+      </view>
+      <view class="count-value mono past" wx:else>
+        已过去 {{nearestParts.days}}<text class="unit">天</text>
+      </view>
+    </block>
+    <view wx:else class="empty">还没有倒计时，去添加一个</view>
+  </view>
+
+  <view class="card" wx:if="{{summary}}">
+    <view class="card-title">今日总结</view>
+    <view class="summary">{{summary}}</view>
+  </view>
+
+  <button class="btn btn-primary full" bindtap="goReview">编辑今日复盘</button>
+</view>

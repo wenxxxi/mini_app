@@ -1,0 +1,14 @@
+[Unit]
+Description=Review MiniApp API
+After=network-online.target
+
+[Service]
+User=rooter
+WorkingDirectory=/home/rooter/review-miniapp/backend
+EnvironmentFile=/home/rooter/review-miniapp/backend/.env
+ExecStart=/home/rooter/review-miniapp/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8081 --workers 1
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
