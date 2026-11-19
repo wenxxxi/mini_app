@@ -283,149 +283,398 @@ _UI_HTML = r"""<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>文件浏览</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>文件</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
-  * { box-sizing: border-box; }
-  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI",sans-serif; background:#f6f7f9; color:#222; }
-  header { position:sticky; top:0; background:#fff; border-bottom:1px solid #eee; padding:10px 16px; z-index:10; }
-  header .crumbs { font-size:14px; color:#555; word-break:break-all; }
-  header .crumbs a { color:#0f62fe; text-decoration:none; }
-  header .crumbs .sep { margin:0 4px; color:#bbb; }
-  main { padding:12px; }
-  .grid { display:grid; gap:10px; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); }
-  .card { background:#fff; border-radius:10px; overflow:hidden; border:1px solid #eee; cursor:pointer; transition:transform .1s, box-shadow .1s; }
-  .card:active { transform:scale(.98); }
-  .thumb { aspect-ratio:4/3; background:#ececf0 center/cover no-repeat; display:flex; align-items:center; justify-content:center; font-size:48px; color:#999; }
-  .thumb.folder { background:#ffd866; color:#a87500; font-size:36px; }
-  .thumb.has-thumb { background:#ececf0; }
-  .meta { padding:6px 8px; }
-  .name { font-size:13px; line-height:1.35; word-break:break-all; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .size { font-size:11px; color:#999; margin-top:2px; }
-  .empty { text-align:center; color:#999; padding:60px 20px; }
-  .preview-mask { position:fixed; inset:0; background:rgba(0,0,0,.85); display:none; align-items:center; justify-content:center; z-index:100; }
-  .preview-mask.show { display:flex; }
-  .preview-mask img, .preview-mask video { max-width:95vw; max-height:92vh; object-fit:contain; }
-  .preview-mask iframe { width:95vw; height:92vh; border:0; background:#fff; }
-  .preview-mask .close { position:absolute; top:10px; right:16px; color:#fff; font-size:28px; cursor:pointer; }
-  .preview-mask .dl-btn { position:absolute; top:14px; left:16px; background:#333; color:#fff; padding:6px 12px; border-radius:6px; text-decoration:none; font-size:14px; }
+/* ========= iOS Files 风格 ========= */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;overflow:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",sans-serif;
+  background:#f2f2f7;color:#000;
+  font-size:17px;line-height:1.42;
+  display:flex;flex-direction:column;
+}
+
+/* 顶部导航栏（iOS UINavigationBar 风格）*/
+.nav{
+  position:sticky;top:0;z-index:20;
+  background:rgba(242,242,247,.85);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:.5px solid rgba(60,60,67,.29);
+  padding-top:env(safe-area-inset-top);
+}
+.nav-bar{
+  display:flex;align-items:center;min-height:44px;
+  padding:0 12px;position:relative;
+}
+.nav-bar .back{
+  display:flex;align-items:center;gap:2px;
+  color:#007aff;font-size:17px;font-weight:400;
+  padding:8px 4px 8px 0;min-height:36px;
+  text-decoration:none;cursor:pointer;
+  border:none;background:none;
+  transition:opacity .15s;
+}
+.nav-bar .back:active{opacity:.5}
+.nav-bar .back .chevron{
+  width:12px;height:20px;position:relative;
+}
+.nav-bar .back .chevron::before,.nav-bar .back .chevron::after{
+  content:"";position:absolute;left:2px;width:12px;height:2px;
+  background:#007aff;border-radius:2px;transform-origin:left center;
+}
+.nav-bar .back .chevron::before{top:6px;transform:rotate(45deg)}
+.nav-bar .back .chevron::after{top:12px;transform:rotate(-45deg)}
+.nav-bar .title{
+  flex:1;text-align:center;font-size:17px;font-weight:600;
+  color:#000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  padding:0 8px;
+}
+.nav-bar .right{
+  min-width:44px;display:flex;justify-content:flex-end;
+}
+
+/* 内容区（可滚动）*/
+.scroll{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+
+/* iOS 列表（UITableView 风格）*/
+.list{margin:0;background:#fff}
+.section{margin-top:24px}
+.section:first-child{margin-top:0}
+.section-header{
+  text-transform:uppercase;font-size:13px;font-weight:600;
+  color:#6d6d72;padding:0 16px 6px;
+}
+.section-header.empty-hint{text-align:center;text-transform:none;color:#8e8e93;font-size:15px;padding-top:80px}
+
+.row{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 16px;min-height:56px;
+  border-bottom:.5px solid rgba(60,60,67,.12);
+  cursor:pointer;position:relative;
+  transition:background .1s;
+}
+.row:active{background:rgba(120,120,128,.12)}
+.row:last-child{border-bottom:none}
+.row.has-parent{padding-left:4px}
+
+/* 左侧图标容器 */
+.row-icon{
+  width:32px;height:32px;border-radius:6px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:#fff;font-weight:600;
+  overflow:hidden;background:#c7c7cc;
+}
+.row-icon.folder{background:#ff9500}
+.row-icon.image{background:#5ac8fa}
+.row-icon.pdf{background:#ff3b30}
+.row-icon.video{background:#af52de}
+.row-icon.audio{background:#ff2d55}
+.row-icon.text{background:#8e8e93}
+.row-icon.has-thumb{padding:0}
+.row-icon.has-thumb img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+
+/* SF Symbol 替代：用 CSS 画简单文件图标 */
+.row-icon .sym{
+  font-size:17px;line-height:1;color:#fff;font-weight:400;
+}
+.row-icon.folder .sym{content:"📁"}
+
+/* 中间文字 */
+.row-body{flex:1;min-width:0}
+.row-name{
+  font-size:17px;color:#000;line-height:1.3;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.row-sub{
+  font-size:13px;color:#8e8e93;margin-top:2px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* 右侧 chevron（iOS 列表分隔符）*/
+.row .acc{
+  width:10px;height:16px;position:relative;flex-shrink:0;opacity:.3;
+}
+.row .acc::before,.row .acc::after{
+  content:"";position:absolute;left:0;width:10px;height:2px;
+  background:#c7c7cc;border-radius:2px;transform-origin:right center;
+}
+.row .acc::before{top:4px;transform:rotate(45deg)}
+.row .acc::after{top:10px;transform:rotate(-45deg)}
+.row.no-acc .acc{display:none}
+
+/* iOS inset 分组（桌面宽屏）*/
+@media (min-width:768px){
+  .list{
+    max-width:720px;margin:24px auto;border-radius:12px;
+    border:.5px solid rgba(60,60,67,.29);overflow:hidden;
+  }
+  .section{max-width:720px;margin:24px auto}
+}
+
+/* 预览遮罩（iOS style）*/
+.pre-mask{
+  position:fixed;inset:0;background:#000;
+  display:none;align-items:center;justify-content:center;
+  z-index:100;flex-direction:column;
+}
+.pre-mask.show{display:flex}
+.pre-mask img,.pre-mask video{
+  max-width:100vw;max-height:calc(100vh - 100px);object-fit:contain;
+}
+.pre-mask iframe{
+  width:100vw;height:calc(100vh - 100px);border:0;background:#fff;
+}
+.pre-topbar{
+  position:absolute;top:0;left:0;right:0;
+  padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;
+  background:rgba(0,0,0,.5);backdrop-filter:blur(20px);
+  display:flex;align-items:center;justify-content:space-between;
+  z-index:101;
+}
+.pre-topbar button,.pre-topbar a{
+  color:#fff;font-size:17px;background:none;border:none;
+  padding:6px 12px;cursor:pointer;text-decoration:none;
+  font-family:inherit;
+}
+.pre-topbar .title{
+  flex:1;text-align:center;color:#fff;font-size:15px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 8px;
+}
+
+/* 加载态 */
+.loading{text-align:center;color:#8e8e93;padding:80px 20px;font-size:15px}
 </style>
 </head>
 <body>
-<header>
-  <div class="crumbs" id="crumbs">加载中…</div>
-</header>
-<main>
-  <div class="grid" id="grid"></div>
-  <div class="empty" id="empty" style="display:none">目录为空</div>
-</main>
-<div class="preview-mask" id="mask">
-  <a class="dl-btn" id="dlBtn" target="_blank" rel="noopener">下载</a>
-  <span class="close" id="close">×</span>
-  <div id="previewBox"></div>
-</div>
-<script>
-const base = "/files";
-let current = "";
 
+<!-- 顶部导航：永不销毁 -->
+<nav class="nav" id="nav">
+  <div class="nav-bar">
+    <button class="back" id="backBtn" disabled style="visibility:hidden">
+      <span class="chevron"></span>
+      <span>返回</span>
+    </button>
+    <div class="title" id="navTitle">文件</div>
+    <div class="right"></div>
+  </div>
+</nav>
+
+<!-- 滚动内容区：只替换这里面的内容 -->
+<main class="scroll" id="scroll">
+  <div class="loading">加载中…</div>
+</main>
+
+<!-- 预览 -->
+<div class="pre-mask" id="mask" role="dialog" aria-modal="true">
+  <div class="pre-topbar">
+    <button id="preClose">完成</button>
+    <div class="title" id="preTitle"></div>
+    <a id="preDl" target="_blank" rel="noopener">下载</a>
+  </div>
+  <div id="preBox"></div>
+</div>
+
+<script>
+"use strict";
+const BASE = "/files";
+let CURRENT = "";        // 当前路径（相对 NAS 根）
+let PARENT = null;       // 父路径（后端返回）
+
+/* ---------- 工具 ---------- */
 function fmtSize(b){
   if (b<1024) return b+" B";
   if (b<1024*1024) return (b/1024).toFixed(1)+" KB";
   if (b<1024*1024*1024) return (b/1024/1024).toFixed(1)+" MB";
   return (b/1024/1024/1024).toFixed(2)+" GB";
 }
-function iconFor(c){ return {folder:"📁",image:"🖼️",pdf:"📕",video:"🎬",audio:"🎵",text:"📄",file:"📦"}[c]||"📦"; }
+function fmtSub(f){
+  if (f.is_dir) return "文件夹";
+  return fmtSize(f.size) + (f.mtime ? " · " + new Date(f.mtime*1000).toLocaleDateString() : "");
+}
+function iconKind(f){
+  if (f.is_dir) return "folder";
+  switch(f.icon){
+    case "image": case "pdf": case "video":
+    case "audio": case "text": return f.icon;
+    default: return "file";
+  }
+}
+function iconGlyph(kind){
+  // SF Symbol 风格文字 fallback（iOS 字体自带 SF Symbols，但 web 不一定，用文字兜底）
+  return {folder:"文件夹",image:"照片",pdf:"PDF",video:"视频",audio:"音乐",text:"文档",file:"文件"}[kind] || "文件";
+}
 
+/* ---------- 加载目录 ---------- */
 async function load(path){
-  current = path;
-  const q = path ? "?path="+encodeURIComponent(path) : "";
-  const res = await fetch(base + q);
-  const data = await res.json();
-  render(data);
-  history.replaceState(null,"",location.pathname + (current===""?"":("?p="+encodeURIComponent(current))));
+  CURRENT = path;
+  const q = path ? "?path=" + encodeURIComponent(path) : "";
+  try{
+    const res = await fetch(BASE + q);
+    if (!res.ok) throw new Error(res.statusText);
+    const data = await res.json();
+    PARENT = data.parent;
+    render(data);
+    // 同步 URL（纯前端路由，浏览器前进/后退可用）
+    history.replaceState(null,"",
+      location.pathname + (CURRENT==="" ? "" : "?p=" + encodeURIComponent(CURRENT)));
+  }catch(e){
+    document.getElementById("scroll").innerHTML =
+      `<div class="loading" style="color:#ff3b30">加载失败：${e.message}</div>`;
+  }
 }
 
+/* ---------- 渲染 ---------- */
 function render(data){
-  // 面包屑
-  const crumbs = document.getElementById("crumbs");
+  // 标题：最后一段
   const parts = data.current.split("/").filter(Boolean);
-  let html = `<a href="#" data-path="">📂 根目录</a>`;
-  let acc = "";
-  for (const p of parts){
-    acc += "/" + p;
-    html += `<span class="sep">/</span><a href="#" data-path="${encodeURIComponent(acc)}">${p}</a>`;
-  }
-  crumbs.innerHTML = html;
-  crumbs.querySelectorAll("a").forEach(a => a.onclick = e => { e.preventDefault(); load(a.dataset.path); });
+  document.getElementById("navTitle").textContent =
+    parts.length ? parts[parts.length-1] : "文件";
 
-  // 网格
-  const grid = document.getElementById("grid");
-  const empty = document.getElementById("empty");
-  if (data.items.length===0){ grid.innerHTML=""; empty.style.display=""; return; }
-  empty.style.display = "none";
-  grid.innerHTML = "";
-  for (const f of data.items){
-    const card = document.createElement("div");
-    card.className = "card";
-    const thumb = document.createElement("div");
-    thumb.className = "thumb";
-    if (f.is_dir){
-      thumb.classList.add("folder");
-      thumb.textContent = "📁";
-    } else if (f.thumb){
-      thumb.classList.add("has-thumb");
-      thumb.style.backgroundImage = `url('${f.thumb}')`;
-    } else {
-      thumb.textContent = iconFor(f.icon);
-    }
-    const meta = document.createElement("div");
-    meta.className = "meta";
-    const name = document.createElement("div"); name.className="name"; name.textContent=f.name;
-    const size = document.createElement("div"); size.className="size";
-    if (f.is_dir){
-      size.textContent = "文件夹";
-    } else {
-      size.textContent = fmtSize(f.size);
-    }
-    meta.appendChild(name); meta.appendChild(size);
-    card.appendChild(thumb); card.appendChild(meta);
-    card.onclick = () => {
-      if (f.is_dir) load(f.path);
-      else openPreview(f);
-    };
-    grid.appendChild(card);
+  // 返回按钮可见性
+  const backBtn = document.getElementById("backBtn");
+  if (PARENT != null){
+    backBtn.style.visibility = "";
+    backBtn.disabled = false;
+    // 按钮文字改成上一级名称
+    const pp = PARENT.split("/").filter(Boolean);
+    backBtn.querySelector("span:last-child").textContent =
+      pp.length ? pp[pp.length-1] : "文件";
+  }else{
+    backBtn.style.visibility = "hidden";
+    backBtn.disabled = true;
   }
+
+  // 内容：分区（文件夹优先，然后文件）
+  const scroll = document.getElementById("scroll");
+  if (!data.items.length){
+    scroll.innerHTML = `<div class="section-header empty-hint">此目录为空</div>`;
+    return;
+  }
+  const dirs = data.items.filter(f => f.is_dir);
+  const files = data.items.filter(f => !f.is_dir);
+
+  let html = "";
+  if (dirs.length){
+    html += `<div class="list">`;
+    for (const d of dirs) html += rowHtml(d);
+    html += `</div>`;
+  }
+  if (files.length){
+    if (dirs.length) html += `<div class="section-header">文件</div>`;
+    html += `<div class="list">`;
+    for (const f of files) html += rowHtml(f);
+    html += `</div>`;
+  }
+  scroll.innerHTML = html;
 }
 
+function rowHtml(f){
+  const kind = iconKind(f);
+  const glyph = iconGlyph(kind);
+  let iconHtml;
+  if (!f.is_dir && f.thumb){
+    iconHtml = `<div class="row-icon ${kind} has-thumb"><img src="${f.thumb}" loading="lazy" alt=""></div>`;
+  }else{
+    iconHtml = `<div class="row-icon ${kind}"><span class="sym">${glyph}</span></div>`;
+  }
+  const noAcc = (f.is_dir) ? "" : ""; // 文件也显示 chevron（iOS 行为）
+  return `
+  <div class="row ${f.is_dir?'has-parent':''}"
+       data-path="${f.path}" data-isdir="${f.is_dir}">
+    ${iconHtml}
+    <div class="row-body">
+      <div class="row-name"></div>
+      <div class="row-sub"></div>
+    </div>
+    <div class="acc"></div>
+  </div>`.replace(
+      /<div class="row-body">[\s\S]*?<\/div>/,
+      `<div class="row-body">
+        <div class="row-name">${escapeHtml(f.name)}</div>
+        <div class="row-sub">${escapeHtml(fmtSub(f))}</div>
+      </div>`
+    );
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------- 事件委托（核心：永不销毁的父容器统一监听）---------- */
+document.getElementById("scroll").addEventListener("click", e => {
+  const row = e.target.closest(".row[data-path]");
+  if (!row) return;
+  const path = row.dataset.path;
+  const isDir = row.dataset.isdir === "true";
+  if (isDir){
+    load(path);
+  }else{
+    // 取原始文件信息（从 DOM 恢复）
+    const name = row.querySelector(".row-name").textContent;
+    const kindClass = row.querySelector(".row-icon").classList;
+    let kind = "file";
+    for (const c of ["folder","image","pdf","video","audio","text"])
+      if (kindClass.contains(c)) kind = c;
+    openPreview({path, name, icon: kind});
+  }
+});
+
+document.getElementById("backBtn").addEventListener("click", () => {
+  if (PARENT != null) load(PARENT);
+});
+
+// 浏览器前进/后退
+window.addEventListener("popstate", () => {
+  const u = new URL(location.href);
+  load(u.searchParams.get("p") || "");
+});
+
+/* ---------- 预览 ---------- */
 function openPreview(f){
-  const box = document.getElementById("previewBox");
+  const box = document.getElementById("preBox");
   box.innerHTML = "";
-  const preUrl = base + "/pre?path=" + encodeURIComponent(f.path);
-  const dlUrl = base + "/dl?path=" + encodeURIComponent(f.path);
-  document.getElementById("dlBtn").href = dlUrl;
+  document.getElementById("preTitle").textContent = f.name;
+  const preUrl = BASE + "/pre?path=" + encodeURIComponent(f.path);
+  const dlUrl  = BASE + "/dl?path=" + encodeURIComponent(f.path);
+  document.getElementById("preDl").href = dlUrl;
+
   const kind = f.icon;
   if (kind==="image"){
     const img = document.createElement("img"); img.src = preUrl; box.appendChild(img);
-  } else if (kind==="video"){
-    const v = document.createElement("video"); v.src = preUrl; v.controls=true; box.appendChild(v);
-  } else if (kind==="audio"){
-    const a = document.createElement("audio"); a.src = preUrl; a.controls=true; box.appendChild(a);
-  } else if (kind==="pdf" || kind==="text"){
+  }else if (kind==="video"){
+    const v = document.createElement("video"); v.src = preUrl; v.controls = true; v.play();
+    box.appendChild(v);
+  }else if (kind==="audio"){
+    const a = document.createElement("audio"); a.src = preUrl; a.controls = true; box.appendChild(a);
+  }else if (kind==="pdf" || kind==="text"){
     const ifr = document.createElement("iframe"); ifr.src = preUrl; box.appendChild(ifr);
-  } else {
-    // 其他直接下载
+  }else{
     window.location.href = dlUrl;
     return;
   }
   document.getElementById("mask").classList.add("show");
 }
-document.getElementById("close").onclick = () => document.getElementById("mask").classList.remove("show");
-document.getElementById("mask").onclick = (e) => { if (e.target.id==="mask") document.getElementById("mask").classList.remove("show"); };
+document.getElementById("preClose").addEventListener("click", () => {
+  const m = document.getElementById("mask");
+  m.classList.remove("show");
+  setTimeout(() => document.getElementById("preBox").innerHTML = "", 300);
+});
 
-// 初始路径
-const url = new URL(location.href);
-const initPath = url.searchParams.get("p") || "";
-load(initPath);
+/* ---------- 启动 ---------- */
+(function(){
+  const u = new URL(location.href);
+  load(u.searchParams.get("p") || "");
+})();
 </script>
 </body>
 </html>
