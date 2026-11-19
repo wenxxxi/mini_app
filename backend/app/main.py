@@ -1,10 +1,11 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 
 from . import models  # noqa: F401  确保建表前模型已注册
 from .db import Base, engine
-from .routers import auth, countdowns, meals, me, reviews, star, stats
+from .routers import auth, countdowns, files, meals, me, reviews, star, stats
 
 APP_VERSION = "0.1.0"
 
@@ -24,6 +25,12 @@ app.include_router(meals.router)
 app.include_router(star.router)
 app.include_router(countdowns.router)
 app.include_router(stats.router)
+app.include_router(files.router)
+
+
+@app.get("/")
+def root_redirect():
+    return RedirectResponse("/files/ui")
 
 
 @app.get("/healthz")
